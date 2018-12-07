@@ -5,7 +5,7 @@ const partials = require('express-partials');
 const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 const models = require('./models');
-
+const user = require('./models/user');
 const app = express();
 
 app.set('views', `${__dirname}/views`);
@@ -78,7 +78,68 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
+app.post('/signup', (req, res, next) => {
+  let username = req.body.username;
+  let password = req.body.password;
 
+  return user.get({username:username})
+    .then((result)=>{
+      if(!result){
+        return user.create({username, password})
+          .then ((result) => {
+          res.writeHead(200, {
+            'location': '/',
+          })
+          res.end();
+      }).error(err => {
+        console.log(err);  
+        }) 
+
+    } else {
+      res.writeHead(200, {
+        'location': '/signup',
+      })
+      res.end();  
+    }
+  })
+ 
+})
+
+app.post('/login', (req, res, next) => {
+  let username = req.body.username;
+  let password = req.body.password;
+
+  return user.get({username:username})
+    .then( (results) => {
+
+        //check if username matches name in db 
+        if( results) {
+
+        let dbUsername = results.username;
+        let dbPassword = results.password;
+        let dbSalt = results.salt;
+
+        if( user.compare(password,dbPassword,dbSalt) ) {
+          res.writeHead(200, {
+            'location': '/',
+          })
+        } else {
+          res.writeHead(200, {
+            'location': '/login',
+          })
+        }
+      } else {
+        //if username is incorrect send 'em to signup 
+        res.writeHead(200, {
+          'location': '/login',
+        })
+      }
+      res.end();
+
+    }).error( (err) => {
+      console.log(err);  
+    }); 
+})
 
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail
