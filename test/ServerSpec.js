@@ -530,7 +530,6 @@ describe('', function() {
     });
 
     it('assigns session to a user when user logs in', function(done) {
-      console.log('STARTING FAILING TEST')
       addUser(function(err, res, body) {
         if (err) { return done(err); }
         var cookies = cookieJar.getCookies('http://127.0.0.1:4568/');
@@ -562,6 +561,7 @@ describe('', function() {
           var cookies = cookieJar.getCookies('http://127.0.0.1:4568/');
           var newCookieValue = cookies[0].value;
           expect(cookieValue).to.not.equal(newCookieValue);
+          console.log('&&&&&&&&&&', cookieValue, newCookieValue);
 
           var queryString = 'SELECT * FROM sessions WHERE hash = ?';
           db.query(queryString, cookieValue, function(error2, sessions) {
@@ -579,6 +579,7 @@ describe('', function() {
     it('Redirects to login page if a user tries to access the main page and is not signed in', function(done) {
       request('http://127.0.0.1:4568/', function(error, res, body) {
         if (error) { return done(error); }
+        console.log('{}{}{}{}{}{}',res.req);
         expect(res.req.path).to.equal('/login');
         done();
       });

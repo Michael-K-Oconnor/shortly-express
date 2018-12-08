@@ -20,10 +20,37 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/', 
 (req, res) => {
-  Auth.createSession(req,res,()=>{
-     res.render('index')
-  });
+  if (req.headers.cookie === undefined) {
+    Auth.createSession(req,res,()=>{  
+      // res.writeHead(200, {
+      //   'location': '/login',
+      // })   
+      res.redirect('/login');        
+    })    
+  } else {
+    return session.get({hash: req.headers.cookie.split('=')[1]})
+    .then ( (result) => {
+      if (!result) {
+        Auth.createSession(req,res,()=>{     
+          // res.writeHead(200, {
+          //   'location': '/login',
+          // })
+          res.redirect('/login'); 
+        })
+      } else {
+        Auth.createSession(req,res,()=>{
+          res.render('index')
+        });
+      }
+    })
+  }
 });
+
+app.get('/login', 
+(req,res) => {
+  console.log("%%%%%%%FOUND ME 2 %%%%%%%%%")
+  res.render('index');
+})
 
 app.get('/create', 
 (req, res) => {
@@ -85,7 +112,6 @@ app.post('/signup', (req, res, next) => {
   let username = req.body.username;
   let password = req.body.password;
   Auth.createSession(req,res,(var1)=>{
-    console.log('SIGNUP', var1)
     return user.get({username:username})
       .then((result)=>{
         if(!result){
@@ -93,8 +119,6 @@ app.post('/signup', (req, res, next) => {
             .then ((result) => {
               let sessionHash = res.req.session.hash;
               let userId = res.req.session.id;
-              //console.log('&*&*&*&*&*&1',sessionHash);
-              //console.log('&*&*&*&*&*&2',userId);
               session.update(sessionHash, userId)
               res.writeHead(200, {
               'location': '/',
@@ -117,7 +141,6 @@ app.post('/login', (req, res, next) => {
   let username = req.body.username;
   let password = req.body.password;
   Auth.createSession(req,res,(var1)=>{
-    console.log('LOGIN', var1)
     return session.create()
     .then ((results) => {
       return user.get({username:username})
@@ -150,6 +173,15 @@ app.post('/login', (req, res, next) => {
     }).error( (err) => {
       console.log(err);  
     }); 
+  })
+})
+
+app.get('/logout', (req, res, next) => {
+  let cookie = req.headers.cookie.split('=')[1]
+  console.log('INSIDE LOGOUT PAGE', cookie)
+  session.delete(cookie)
+  Auth.createSession(req,res,()=>{
+    res.end();
   })
 })
 

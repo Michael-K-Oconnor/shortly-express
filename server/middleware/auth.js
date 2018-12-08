@@ -3,9 +3,6 @@ const Promise = require('bluebird');
 const session = require('../models/session.js')
 
 module.exports.createSession = (req, res, next) => {
-    if (req.body.username) {
-        console.log('HERES the user name ', req.body.username)
-    }
     if (JSON.stringify(req.cookies) === JSON.stringify({}) || !req.cookies ) {
         res.cookies ={};
         return session.create()
@@ -15,7 +12,7 @@ module.exports.createSession = (req, res, next) => {
         .then ((result) => {
             req.session = result;
             res.cookie('shortlyid',result.hash);
-            next('TEST');
+            next();
         })
     } else {
         let hash = req.cookies.shortlyid; 
@@ -24,7 +21,7 @@ module.exports.createSession = (req, res, next) => {
             if(result){
                 req.session = result;
                 res.cookie('shortlyid',result.hash);
-                next('TEST');
+                next();
             } else {
                 return session.create()
                 .then ( (result) => {
@@ -33,7 +30,7 @@ module.exports.createSession = (req, res, next) => {
                 .then ((result) => {
                     req.session = result;
                     res.cookie('shortlyid',result.hash);
-                    next('TEST');
+                    next();
                 })
             }
         })

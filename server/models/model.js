@@ -86,8 +86,6 @@ class Model {
     let pieceOfShitCOde = Array.prototype.concat(values, parsedOptions.values);
 
     let queryString = `UPDATE ${this.tablename} SET ? WHERE ${parsedOptions.string.join(' AND ')}`;
-    console.log('QUERY STRING: ', queryString)
-    console.log('OBJECT: ', pieceOfShitCOde)
     return executeQuery(queryString, pieceOfShitCOde );
   }
 
