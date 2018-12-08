@@ -83,8 +83,12 @@ class Model {
    */
   update(options, values) {
     let parsedOptions = parseData(options);
+    let pieceOfShitCOde = Array.prototype.concat(values, parsedOptions.values);
+
     let queryString = `UPDATE ${this.tablename} SET ? WHERE ${parsedOptions.string.join(' AND ')}`;
-    return executeQuery(queryString, Array.prototype.concat(values, parsedOptions.values));
+    console.log('QUERY STRING: ', queryString)
+    console.log('OBJECT: ', pieceOfShitCOde)
+    return executeQuery(queryString, pieceOfShitCOde );
   }
 
   /**

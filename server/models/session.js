@@ -50,12 +50,23 @@ class Sessions extends Model {
    * @returns {Promise<Object>} A promise that is fulfilled with the results of
    * an insert query or rejected with the error that occured.
    */
-  create() {
+  create(username) {
     console.log('Successfully into session create')
     let data = utils.createRandom32String();
     let hash = utils.createHash(data);
     return super.create.call(this, { hash });
   }
+
+  update(sessionHash, userId) {
+    let options = {hash: sessionHash, userId: 0};
+    let values = {hash: sessionHash, userId: userId};
+    console.log('&*&*&*&*&*&1',options);
+    console.log('&*&*&*&*&*&2',values);
+    return super.update.call(this, options, values)
+  }
+
 }
+
+
 
 module.exports = new Sessions();
